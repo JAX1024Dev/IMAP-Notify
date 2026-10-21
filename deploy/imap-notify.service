@@ -1,0 +1,24 @@
+[Unit]
+Description=IMAP-Notify - IMAP IDLE to Bark
+Documentation=https://github.com/JAX1024Dev/IMAP-Notify
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=imap-notify
+Group=imap-notify
+ExecStart=/usr/local/bin/imap-notify -c /etc/imap-notify/config.toml
+Restart=on-failure
+RestartSec=10
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=
+AmbientCapabilities=
+
+[Install]
+WantedBy=multi-user.target

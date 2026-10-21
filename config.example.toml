@@ -1,0 +1,50 @@
+# IMAP-Notify 配置示例
+# 复制为 config.toml 后填入你自己的信息。
+
+[bark]
+# 【必填】Bark 推送地址（App 内复制，含设备 Key）
+url = "https://api.day.app/你的Key"
+
+# 【可选】全局默认图标；不填则自动使用发件人邮箱域名的 favicon
+# icon = "https://example.com/mail.png"
+
+# 【可选】favicon 服务 URL 模板，{domain} 会替换为发件人邮箱域名。
+# 默认 icon.horse（返回 PNG）。图标由 iPhone 展示通知时拉取，需为 PNG/JPG。
+# 大陆网络可尝试：https://favicon.qq.com/favicon/{domain}
+# 或 Google 服务：https://www.google.com/s2/favicons?domain={domain}&sz=64
+# favicon_template = "https://icon.horse/icon/{domain}"
+
+# 【可选】推送声音，见 Bark App 声音列表
+# sound = "bell"
+
+# 【可选】通知级别：active（默认）/ passive / timeSensitive / critical
+# level = "timeSensitive"
+
+# 【可选】单次 IDLE 等待时长（秒），60-1740，默认 600
+# 超出范围将报错；不会静默截断。
+# idle_timeout_secs = 600
+
+# ─────────────────────────────────────────────
+# 邮箱账户：每个账户监听一个文件夹；alias（或默认 username）必须唯一。
+# 993 使用 TLS，其他端口要求 STARTTLS，不允许明文降级。
+# ─────────────────────────────────────────────
+
+[[accounts]]
+alias = "QQ邮箱"                 # 通知标题与分组中显示的名称（不填则用 username）
+host = "imap.qq.com"
+port = 993                       # 默认 993，一般无需修改
+username = "123456789@qq.com"
+password = "QQ邮箱授权码"         # 不是 QQ 密码！在 QQ邮箱 设置-账户 中开启 IMAP 后生成
+# password_cmd = "pass show email/qq" # 可信 shell 命令，仅输出密码；优先于 password
+# --check / --test-bark 不执行密码命令。systemd 下需确保专用服务用户可执行。
+# folder = "INBOX"               # 默认 INBOX
+# icon = "https://.../qq.png"    # 可选：该账户固定图标（优先于全局与 favicon）
+# url = "https://mail.qq.com"    # 可选：点击通知跳转
+
+[[accounts]]
+alias = "Gmail"
+host = "imap.gmail.com"
+port = 993
+username = "me@gmail.com"
+password = "Gmail应用专用密码"    # Google 账号 → 安全性 → 两步验证 → 应用专用密码
+# url = "https://mail.google.com"

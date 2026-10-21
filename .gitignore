@@ -1,0 +1,8 @@
+/target/
+/.zcode/
+/config.toml
+/config.*.local.toml
+.env
+.env.*
+.DS_Store
+/dist/

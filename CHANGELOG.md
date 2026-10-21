@@ -16,6 +16,8 @@
 
 ### 可靠性与隐私
 
+- IMAP 改用 native-tls，移除存在 7 项已公开漏洞的旧 rustls/webpki 依赖链；Linux 需 OpenSSL 3 运行库。
+
 - 同一进程内按 UIDVALIDITY 保留重连进度，补查断线窗口。
 - 修复 IDLE 超时不返回业务层、批量 FETCH 部分失败重复通知、退避不重置。
 - 检查 IDLE 能力、目标 FETCH UID 与 UID 上界，保留邮箱未读状态。
@@ -24,7 +26,7 @@
 
 ### 工程与文档
 
-- Linux/macOS CI、Rust 1.88 兼容性检查。
+- Linux/macOS CI、Rust 1.88 兼容性与 RustSec 依赖审计。
 - 四平台发布包、SHA-256 校验清单与标签触发的 GitHub Release。
 - 中文 README、需求验收标准、审查修复记录和维护者交接指南。
 - 移除容器构建文件与部署说明，补齐 MIT LICENSE。

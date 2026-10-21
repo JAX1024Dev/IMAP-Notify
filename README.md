@@ -32,11 +32,11 @@
 | macOS | Apple Silicon | `aarch64-apple-darwin.tar.gz` |
 | macOS | Intel | `x86_64-apple-darwin.tar.gz` |
 
-Linux 预编译包基于 Ubuntu 24.04 构建，需要 glibc 2.39 或更新版本和系统 CA 证书。旧系统请在目标系统从源码编译。macOS 包未经 Apple 签名或公证，首次运行可能需要在系统安全设置中允许。
+Linux 预编译包基于 Ubuntu 24.04 构建，需要 glibc 2.39 或更新版本、OpenSSL 3 运行库和系统 CA 证书。旧系统请在目标系统从源码编译。macOS 包未经 Apple 签名或公证，首次运行可能需要在系统安全设置中允许。
 
 下载 `SHA256SUMS` 与压缩包放在同一目录，可使用 `sha256sum --ignore-missing -c SHA256SUMS` 校验；macOS 使用 `shasum -a 256 <压缩包>` 与清单中的值比较。
 
-也可以用 Rust **1.88+** 从源码构建：
+也可以用 Rust **1.88+** 从源码构建。Linux 需安装 C 编译工具、`pkg-config`、OpenSSL 开发包和 CA 证书（Debian/Ubuntu：`sudo apt-get install build-essential pkg-config libssl-dev ca-certificates`）；macOS 需安装 Xcode Command Line Tools：
 
 ```bash
 git clone https://github.com/JAX1024Dev/IMAP-Notify.git
@@ -170,7 +170,7 @@ cargo test --locked
 cargo build --release --locked
 ```
 
-CI 在 Linux 和 macOS 上运行格式检查、Clippy、测试和发布构建，并单独检查 Rust 1.88 兼容性。测试使用本地 HTTP 服务和脚本化 IMAP 传输，不依赖真实邮箱。真实邮箱到 iPhone 的端到端验证仍需手动完成。
+CI 在 Linux 和 macOS 上运行格式检查、Clippy、测试和发布构建，并单独检查 Rust 1.88 兼容性与 RustSec 依赖漏洞。测试使用本地 HTTP 服务和脚本化 IMAP 传输，不依赖真实邮箱。真实邮箱到 iPhone 的端到端验证仍需手动完成。
 
 发布时更新 `Cargo.toml`、`Cargo.lock`、`CHANGELOG.md` 和 `docs/releases/vX.Y.Z.md`，提交后推送匹配的 `vX.Y.Z` 标签。[Release 工作流](.github/workflows/release.yml) 会完成检查、四个平台构建、打包和 SHA-256 校验文件，再发布 GitHub Release。也可在 Actions 中选择已有版本标签手动重跑。仅发布任务拥有 `contents: write` 权限，无需额外配置仓库 Secret。
 

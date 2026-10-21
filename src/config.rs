@@ -208,6 +208,13 @@ fn build_config(raw: RawConfig, mode: LoadMode) -> Result<AppConfig> {
                 .password_cmd
                 .as_deref()
                 .is_some_and(|s| !s.trim().is_empty());
+            if !has_command
+                && a.password
+                    .as_deref()
+                    .is_some_and(|p| p.trim().chars().any(char::is_control))
+            {
+                bail!("[{alias}] 密码含控制字符");
+            }
             if mode != LoadMode::TestBark && !has_password && !has_command {
                 bail!("[{alias}] 未配置 password 或 password_cmd");
             }

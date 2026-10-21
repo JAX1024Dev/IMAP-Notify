@@ -4,6 +4,7 @@
 
 | 优先级 | 原问题及影响 | 修复与验证 |
 | --- | --- | --- |
+| P1 | 原 IMAP rustls 0.22 / webpki 0.102 依赖链有 7 项已公开漏洞，且无法直接升级旧 connector 约束 | 改用库内建 native-tls；移除旧链，cargo audit 无漏洞、无警告；Linux OpenSSL 依赖已写入 README |
 | P1 | 每次网络重连重建 UIDNEXT，断线期间的新邮件被跳过 | 每账户持有内存游标，按 UIDVALIDITY 决定复用或重建；重连先补查，协议回归测试验证 |
 | P1 | IMAP IDLE 默认 keepalive 在库内部续接，业务层超时检查无法执行 | 显式 `keepalive(false)`；模拟 TimedOut 验证 DONE 后执行 SEARCH |
 | P1 | Bark 把成功 HTTP 下缺失 code 的空/非法 JSON 当成功 | 仅接受 HTTP 2xx 且整数 code=200；本地 HTTP 测试验证拒绝与重试 |
@@ -35,9 +36,12 @@
 cargo fmt --all -- --check
 cargo clippy --locked --all-targets -- -D warnings
 cargo test --locked
+cargo audit
 cargo build --release --locked
 ./target/release/imap-notify --version
 ./target/release/imap-notify -c config.example.toml --check
 ```
 
-本地测试包括 28 项单元/协议测试和 2 项 CLI 集成测试。GitHub CI 对 Linux/macOS 重复执行检查，并额外验证 Rust 1.88 构建兼容性。远程执行结果以仓库 Actions 为准。
+本地测试包括 28 项单元/协议测试和 2 项 CLI 集成测试。GitHub CI 对 Linux/macOS 重复执行检查，并额外验证 Rust 1.88 构建兼容性。远程执行结果以仓库 Actions 为准。工作流另经 actionlint 校验，文档相对链接与 Git 暂存区空白检查通过。
+
+依赖审计依据：[rustls Debug 泄露](https://rustsec.org/advisories/RUSTSEC-2026-0346)、[密钥交换降级](https://rustsec.org/advisories/RUSTSEC-2026-0349)、[证书信任链验证](https://rustsec.org/advisories/RUSTSEC-2026-0382)；完整旧依赖链问题编号见交接文档。

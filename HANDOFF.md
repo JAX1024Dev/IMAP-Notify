@@ -52,6 +52,12 @@ main → 参数解析 → Watch / Check / TestBark 配置模式
 - `AccountConfig`、`BarkConfig` 的 Debug 不打印凭据；TOML 源行、HTTP URL、密码命令、服务端 message 不进入应用错误日志。
 - 通知数据交给配置的 Bark 服务；默认日志仅保留账户别名和 UID。
 
+## TLS 依赖审计决策
+
+发布前 `cargo audit` 在原 IMAP rustls 依赖链中发现 7 项漏洞：rustls 0.22.4 的 RUSTSEC-2026-0346/0349，以及 rustls-webpki 0.102.8 的 RUSTSEC-2026-0049/0098/0099/0104/0382。上游 imap alpha 的 rustls-connector 版本约束无法仅通过锁文件升级解除。
+
+因此 IMAP 改用该库现有的 `native-tls` 后端，继续保持 AutoTls（993 直接 TLS，其他端口必须 STARTTLS）和证书校验。macOS 使用系统 TLS，Linux 使用 OpenSSL。Bark HTTP 仍使用已更新的 rustls 0.23 系列。该调整避免自行实现 TLS/STARTTLS 传输，也移除了旧 rustls 链及其未维护的 rustls-pemfile。代价是 Linux 构建需要 OpenSSL 开发包，发布包需要 OpenSSL 3 运行库；README 已同步。不要重新开启原 `rustls-tls` feature，除非上游已更新且审计通过。
+
 ## 当前限制与运维
 
 - 游标不持久化。网络重连可补查，进程重启和 UIDVALIDITY 变化会跳过存量。
@@ -64,6 +70,8 @@ main → 参数解析 → Watch / Check / TestBark 配置模式
 - 连接中断自动退避；认证失败通常需要人工更新授权码，单账户不会阻断其他账户。
 
 ## 开发与验证
+
+依赖安全检查：`cargo audit`（需安装 cargo-audit），CI 使用 RustSec 审计。
 
 Rust 1.88+，edition 2024；完整锁文件需入库。提交前执行 README 开发章节中的四项检查。协议回归测试使用真实 IMAP 解析器加脚本传输，Bark 使用本地 TCP HTTP 服务，不访问真实邮箱。CLI 测试启动实际二进制检查参数和脱敏。
 
